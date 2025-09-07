@@ -9,3 +9,7 @@ I am using this to add PID to a digiboil system, so not using the pump functiona
 for now, although I may add an integrated pump later.
 
 https://www.aliexpress.com/item/1005008797813823.html
+
+https://kegland.com.au/products/35l-digiboil-digital-turbo-boiler-2400watt
+
+This is early days in the development while I am waiting for hardware to arrive.
