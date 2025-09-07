@@ -1,5 +1,3 @@
-# webserver.py
-
 import socket
 
 def start_web_server(model):
@@ -22,21 +20,41 @@ def start_web_server(model):
                     if key == 'p': model.pid.kp = float(val)
                     if key == 'i': model.pid.ki = float(val)
                     if key == 'd': model.pid.kd = float(val)
+                    if key == 'pump': model.toggle_pump()
+                    if key == 'heater': model.toggle_heater()
             except:
                 pass
 
         # Build HTML response
         html = f"""<!DOCTYPE html>
         <html>
-        <head><title>Brewing PID Control</title></head>
+        <head>
+            <title>Brewing PID Control</title>
+            <style>
+                body {{ font-family: Arial; background: #f4f4f4; padding: 20px; }}
+                h2 {{ color: #333; }}
+                .status {{ margin-top: 10px; font-weight: bold; }}
+                button {{ padding: 10px 20px; margin: 5px; }}
+            </style>
+        </head>
         <body>
-        <h2>Current Temp: {model.temperature:.2f}°C</h2>
-        <form>
-            P: <input name="p" value="{model.pid.kp}"><br>
-            I: <input name="i" value="{model.pid.ki}"><br>
-            D: <input name="d" value="{model.pid.kd}"><br>
-            <input type="submit" value="Update PID">
-        </form>
+            <h2>Current Temperature: {model.temperature:.2f}°C</h2>
+            <div class="status">
+                Heater: {'ON' if model.heater_on else 'OFF'}<br>
+                Pump: {'ON' if model.pump_on else 'OFF'}
+            </div>
+            <form>
+                <h3>PID Settings</h3>
+                P: <input name="p" value="{model.pid.kp}"><br>
+                I: <input name="i" value="{model.pid.ki}"><br>
+                D: <input name="d" value="{model.pid.kd}"><br>
+                <input type="submit" value="Update PID">
+            </form>
+            <form>
+                <h3>Actuator Control</h3>
+                <button name="pump" value="toggle">Toggle Pump</button>
+                <button name="heater" value="toggle">Toggle Heater</button>
+            </form>
         </body>
         </html>"""
 
