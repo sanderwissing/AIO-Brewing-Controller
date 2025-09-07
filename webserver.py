@@ -21,7 +21,7 @@ def start_web_server(model):
                     if key == 'i': model.pid.ki = float(val)
                     if key == 'd': model.pid.kd = float(val)
                     if key == 'pump': model.toggle_pump()
-                    if key == 'heater': model.toggle_heater()
+                    if key == 'heater': model.toggle_heater_enabled()  # 👈 Updated call
             except:
                 pass
 
@@ -40,7 +40,7 @@ def start_web_server(model):
         <body>
             <h2>Current Temperature: {model.temperature:.2f}°C</h2>
             <div class="status">
-                Heater: {'ON' if model.heater_on else 'OFF'}<br>
+                Heater Enabled: {'YES' if model.heater_enabled else 'NO'}<br>
                 Pump: {'ON' if model.pump_on else 'OFF'}
             </div>
             <form>
@@ -53,7 +53,7 @@ def start_web_server(model):
             <form>
                 <h3>Actuator Control</h3>
                 <button name="pump" value="toggle">Toggle Pump</button>
-                <button name="heater" value="toggle">Toggle Heater</button>
+                <button name="heater" value="toggle">Toggle Heater Enabled</button>
             </form>
         </body>
         </html>"""
