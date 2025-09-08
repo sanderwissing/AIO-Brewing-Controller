@@ -22,6 +22,8 @@ def start_web_server(model):
                     if key == 'd': model.pid.kd = float(val)
                     if key == 'pump': model.toggle_pump()
                     if key == 'heater': model.toggle_heater_enabled()  # 👈 Updated call
+                    if key == 'autotune':
+                        model.auto_tune_pid()
             except:
                 pass
 
@@ -54,6 +56,7 @@ def start_web_server(model):
                 <h3>Actuator Control</h3>
                 <button name="pump" value="toggle">Toggle Pump</button>
                 <button name="heater" value="toggle">Toggle Heater Enabled</button>
+                <button name="autotune" value="run">Auto-Tune PID</button>
             </form>
         </body>
         </html>"""

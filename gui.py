@@ -21,6 +21,16 @@ class BrewingGUI:
         self.temp_label = lv.label(self.scr)
         self.temp_label.set_text("Temp: --°C")
         self.temp_label.align(lv.ALIGN.TOP_MID, 0, 10)
+        # Set bigger font for temperature label
+        big_font_style = lv.style_t()
+        big_font_style.init()
+        # Use a built-in large font or custom font if available
+        # Example: lv.font_montserrat_48 (if available)
+        if hasattr(lv, 'font_montserrat_48'):
+            big_font_style.set_text_font(lv.font_montserrat_48)
+        else:
+            big_font_style.set_text_font(lv.font_default())
+        self.temp_label.add_style(big_font_style, 0)
 
         self.setpoint_label = lv.label(self.scr)
         self.setpoint_label.set_text("Setpoint: --°C")
@@ -82,7 +92,12 @@ class BrewingGUI:
         self.ip_style.set_text_color(lv.color_hex(0x808080))  # Gray color
         self.ip_label.add_style(self.ip_style, 0)
 
-        # Network status indicator (small dot next to IP)
+        # Settings button
+        self.btn_settings = lv.btn(self.scr)
+        self.btn_settings.set_size(60, 40)
+        self.btn_settings.align(lv.ALIGN.TOP_RIGHT, -10, 180)
+        lv.label(self.btn_settings).set_text("⚙️")
+        self.btn_settings.add_event_cb(self.open_settings_dialog, lv.EVENT.CLICKED, None)
         self.net_status = lv.label(self.scr)
         self.net_status.set_text("●")
         self.net_status.align(lv.ALIGN.BOTTOM_MID, -80, -10)
@@ -267,6 +282,61 @@ class BrewingGUI:
                 return {'status': 'disconnected'}
         except Exception as e:
             return {'error': str(e)}
+
+    def open_settings_dialog(self, event):
+        # Create a modal dialog
+        self.settings_dialog = lv.obj(self.scr)
+        self.settings_dialog.set_size(300, 200)
+        self.settings_dialog.align(lv.ALIGN.CENTER, 0, 0)
+        self.settings_dialog.set_style_bg_color(lv.color_hex(0xFFFFFF), 0)
+        self.settings_dialog.set_style_radius(10, 0)
+
+        title = lv.label(self.settings_dialog)
+        title.set_text("Settings")
+        title.align(lv.ALIGN.TOP_MID, 0, 10)
+
+        # Auto-Tune button
+        btn_autotune = lv.btn(self.settings_dialog)
+        btn_autotune.set_size(180, 40)
+        btn_autotune.align(lv.ALIGN.CENTER, 0, 30)
+        lv.label(btn_autotune).set_text("Auto-Tune PID")
+        btn_autotune.add_event_cb(self.run_autotune, lv.EVENT.CLICKED, None)
+
+        # Calibration offset input
+        offset_label = lv.label(self.settings_dialog)
+        offset_label.set_text("Calibration Offset:")
+        offset_label.align(lv.ALIGN.CENTER, 0, 80)
+
+        self.offset_input = lv.textarea(self.settings_dialog)
+        self.offset_input.set_size(100, 30)
+        self.offset_input.align(lv.ALIGN.CENTER, 80, 80)
+        self.offset_input.set_text(str(getattr(self.model.sensor, 'calibration_offset', 0.0)))
+
+        btn_set_offset = lv.btn(self.settings_dialog)
+        btn_set_offset.set_size(80, 30)
+        btn_set_offset.align(lv.ALIGN.CENTER, 0, 120)
+        lv.label(btn_set_offset).set_text("Set Offset")
+        btn_set_offset.add_event_cb(self.set_calibration_offset, lv.EVENT.CLICKED, None)
+
+        # Close button
+        btn_close = lv.btn(self.settings_dialog)
+        btn_close.set_size(80, 30)
+        btn_close.align(lv.ALIGN.BOTTOM_MID, 0, -10)
+        lv.label(btn_close).set_text("Close")
+        btn_close.add_event_cb(lambda e: self.settings_dialog.delete(), lv.EVENT.CLICKED, None)
+
+    def set_calibration_offset(self, event):
+        try:
+            offset = float(self.offset_input.get_text())
+            if hasattr(self.model, 'set_calibration_offset'):
+                self.model.set_calibration_offset(offset)
+            msg = lv.label(self.settings_dialog)
+            msg.set_text(f"Offset set to {offset}")
+            msg.align(lv.ALIGN.CENTER, 0, 150)
+        except Exception as e:
+            msg = lv.label(self.settings_dialog)
+            msg.set_text(f"Error: {e}")
+            msg.align(lv.ALIGN.CENTER, 0, 150)
 
 # --- Splash Screen ---
 def show_splash_screen(image_path):
